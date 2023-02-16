@@ -30,6 +30,7 @@ import rospy
 import cv2 as cv
 import numpy as np
 
+from image_transport.ImageTransport import ImageTransport
 from sensor_msgs.msg import CompressedImage
 from radar_view.msg import RadarObjArray, RadarObj
 
@@ -52,13 +53,13 @@ class RadarView():
         rospy.init_node("radar_view",anonymous=True)
 
         try:
-            self.in_topic     = rospy.get_param("~input_topic")
-            self.out_topic    = rospy.get_param("~output_topic")
-            self.map_grad     = rospy.get_param("~map_graduation",10)
-            self.map_res      = rospy.get_param("~map_resolution",1024)
-            self.map_range    = rospy.get_param("~map_range",80)
-            self.frequency    = rospy.get_param("~frequency",5)
-            self.is_clockwise = rospy.get_param("~clockwise",False)
+            self.in_topic     = str  (rospy.get_param("~input_topic"))
+            self.out_topic    = str  (rospy.get_param("~output_topic"))
+            self.map_grad     = float(rospy.get_param("~map_graduation",10))
+            self.map_res      = int  (rospy.get_param("~map_resolution",1024))
+            self.map_range    = float(rospy.get_param("~map_range",80))
+            self.frequency    = int  (rospy.get_param("~frequency",5))
+            self.is_clockwise = bool (rospy.get_param("~clockwise",False))
         except KeyError as e:
             rospy.logerr("[radar-view] Error on init, missing parameter named {} !".format(str(e)))
             sys.exit()
@@ -66,7 +67,7 @@ class RadarView():
         self.map_ratio     = self.map_res / (2 * self.map_range) * (1-RadarView.MARGIN_PERCENT)
         self.margin        = int(RadarView.MARGIN_PERCENT/2*self.map_res)
         self.map_h_res     = int(self.map_res/2) # Half resolution
-        self.map_publisher = rospy.Publisher(self.out_topic, CompressedImage, queue_size=3)
+        self.map_publisher = ImageTransport.advertise(self.out_topic,3)
         self.buffer        = []
 
         self._generate_background()
@@ -197,12 +198,7 @@ class RadarView():
                     cv.rectangle(img,(x,y-23),(x+text_size[0],y-23-text_size[1]),(0,0,0),-1)
                     cv.putText(img,label,(x,y-23),cv.FONT_HERSHEY_DUPLEX,1.3,(b,g,r),2)
 
-        msg = CompressedImage()
-        msg.header.stamp = rospy.Time.now()
-        msg.format = "jpeg"
-        msg.data = np.array(cv.imencode('.jpg', img)[1]).tobytes()
-
-        self.map_publisher.publish(msg)
+        self.map_publisher.publish(img)
 
 if __name__ == "__main__":
     RadarView()

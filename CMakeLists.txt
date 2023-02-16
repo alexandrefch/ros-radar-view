@@ -5,6 +5,7 @@ find_package(catkin REQUIRED COMPONENTS
 	rospy
 	sensor_msgs
 	std_msgs
+  image_transport_py
 	message_generation
 )
 
