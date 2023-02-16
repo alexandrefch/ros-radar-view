@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>radar_view</name>
+  <version>0.0.1</version>
+  <description>Create a radar view from relatives points</description>
+
+  <license>Apache License 2.0</license>
+
+  <author email="foucher@univ-ubs.fr">Alexandre Foucher</author>
+  <maintainer email="foucher@univ-ubs.fr">Alexandre Foucher</maintainer>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <depend>message_generation</depend>
+  <depend>message_runtime</depend>
+  <depend>rospy</depend>
+  <depend>sensor_msgs</depend>
+  <depend>std_msgs</depend>
+</package>
